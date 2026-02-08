@@ -1,39 +1,75 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 
 <head>
     <meta charset="UTF-8">
-
-    <script src="lib-node.js"></script>
+    <title>Node Graph — Demo</title>
 
     <style>
+        /* RESET SAFE */
+        body {
+            margin: 0;
+            background: #0f172a;
+            font-family: system-ui;
+        }
+
+        /* zone de démo centrée */
+        .wrapper {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* protège le canvas */
         node-canvas {
-            height: 80vh;
+            width: 1100px;
+            height: 600px;
+
+            --node-bg: #020617;
+            --line-color: #38bdf8;
+            --line-width: 3;
+        }
+
+        /* style nodes (facultatif mais joli) */
+        node-item {
+            --node-bg: #0f172a;
+            --node-border: 1px solid #334155;
+            --node-text: #e2e8f0;
         }
     </style>
+
+    <!-- VERY IMPORTANT -->
+    <script src="lib-node.js" defer></script>
+
 </head>
 
 <body>
 
-    <node-canvas>
+    <div class="wrapper">
 
-        <node-item id="A" to="B" style="left:100px;top:100px;">
-            Register
-        </node-item>
+        <node-canvas>
 
-        <node-item id="B" to="C,D" style="left:400px;top:200px;">
-            Dashboard
-        </node-item>
+            <node-item id="home" to="pricing,features" style="left:80px; top:250px;">
+                Home
+            </node-item>
 
-        <node-item id="C" style="left:700px;top:100px;">
-            Jeux
-        </node-item>
+            <node-item id="features" to="signup" style="left:420px; top:120px;">
+                Features
+            </node-item>
 
-        <node-item id="D" style="left:700px;top:350px;">
-            Leave
-        </node-item>
+            <node-item id="pricing" to="signup" style="left:420px; top:380px;">
+                Pricing
+            </node-item>
 
-    </node-canvas>
+            <node-item id="signup" style="left:780px; top:250px;">
+                Sign Up
+            </node-item>
+
+        </node-canvas>
+
+    </div>
 
 </body>
 
