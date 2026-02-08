@@ -1,8 +1,7 @@
 // ==========================================================
-// NODE GRAPH — CORE LIB
+// NODE GRAPH — CORE LIB (Stable Version)
 // Auteur : Yrieix MICHAUD
 // ==========================================================
-
 
 class NodeCanvas extends HTMLElement {
 
@@ -13,7 +12,6 @@ class NodeCanvas extends HTMLElement {
 
     connectedCallback() {
 
-        // Structure minimale
         this.shadowRoot.innerHTML = `
         <style>
 
@@ -21,12 +19,13 @@ class NodeCanvas extends HTMLElement {
                 display:block;
                 position:relative;
                 width:100%;
-                height:600px;
+                height:var(--canvas-height,600px);
                 overflow:hidden;
 
+                background:var(--node-bg,#f1f5f9);
+
                 /* Variables stylables */
-                --node-bg:#f5f7fb;
-                --line-color:#1e293b;
+                --line-color:#0f172a;
                 --line-width:2;
             }
 
@@ -35,7 +34,6 @@ class NodeCanvas extends HTMLElement {
                 inset:0;
                 width:100%;
                 height:100%;
-
                 pointer-events:none;
                 z-index:0;
             }
@@ -56,6 +54,7 @@ class NodeCanvas extends HTMLElement {
 
         let raf = null;
 
+        // redraw optimisé
         this.addEventListener('node-move', () => {
 
             if (raf) return;
@@ -67,17 +66,17 @@ class NodeCanvas extends HTMLElement {
 
         });
 
-        // premier rendu
-        requestAnimationFrame(() => {
+        setTimeout(() => {
             this.loadPositions();
             this.drawAllLinks();
-        });
+        }, 60);
 
-        // redraw si resize écran
+        // redraw si resize
         new ResizeObserver(() => {
             this.drawAllLinks();
         }).observe(this);
     }
+
 
     drawAllLinks() {
 
@@ -102,8 +101,8 @@ class NodeCanvas extends HTMLElement {
             });
 
         });
-
     }
+
 
     drawCurve(start, end) {
 
@@ -117,22 +116,23 @@ class NodeCanvas extends HTMLElement {
         const x2 = r2.left - canvasRect.left;
         const y2 = r2.top + r2.height / 2 - canvasRect.top;
 
-        // intensité de la courbe (auto)
-        const distance = Math.abs(x2 - x1);
-        const curve = Math.max(60, distance * 0.4);
-
-        const c1x = x1 + curve;
-        const c2x = x2 - curve;
+        // courbe adaptative (beaucoup plus naturelle)
+        const dx = Math.abs(x2 - x1);
+        const curve = Math.max(80, dx * 0.5);
 
         const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
 
         path.setAttribute(
             "d",
-            `M ${x1} ${y1} C ${c1x} ${y1}, ${c2x} ${y2}, ${x2} ${y2}`
+            `M ${x1} ${y1} 
+             C ${x1 + curve} ${y1}, 
+               ${x2 - curve} ${y2}, 
+               ${x2} ${y2}`
         );
 
         this.svg.appendChild(path);
     }
+
 
     savePosition(id, x, y) {
 
@@ -161,7 +161,6 @@ class NodeCanvas extends HTMLElement {
     }
 }
 
-
 class NodeItem extends HTMLElement {
 
     constructor() {
@@ -183,7 +182,8 @@ class NodeItem extends HTMLElement {
 
                 --node-bg:white;
                 --node-border:1px solid #cbd5e1;
-                --radius:8px;
+                --node-text:#0f172a;
+                --radius:10px;
             }
 
             .card{
@@ -192,6 +192,10 @@ class NodeItem extends HTMLElement {
                 border-radius:var(--radius);
                 padding:12px;
                 text-align:center;
+                color:var(--node-text);
+                font-family:system-ui;
+                font-size:14px;
+                box-shadow:0 6px 18px rgba(0,0,0,0.06);
             }
 
         </style>
@@ -208,17 +212,24 @@ class NodeItem extends HTMLElement {
     initDrag() {
 
         let offsetX, offsetY;
-        let moved = false;
+        let raf = null;
 
         const mouseMove = (e) => {
 
-            moved = true;
+            if (raf) return;
 
-            this.style.left = (e.clientX - offsetX) + 'px';
-            this.style.top = (e.clientY - offsetY) + 'px';
+            raf = requestAnimationFrame(() => {
 
-            this.dispatchEvent(new CustomEvent('node-move', { bubbles: true }));
+                this.style.left = (e.clientX - offsetX) + 'px';
+                this.style.top = (e.clientY - offsetY) + 'px';
 
+                this.dispatchEvent(
+                    new CustomEvent('node-move', { bubbles: true })
+                );
+
+                raf = null;
+
+            });
         };
 
         const mouseUp = () => {
@@ -229,7 +240,6 @@ class NodeItem extends HTMLElement {
             const canvas = this.closest('node-canvas');
 
             canvas?.savePosition(this.id, this.offsetLeft, this.offsetTop);
-
         };
 
         this.addEventListener('mousedown', (e) => {
