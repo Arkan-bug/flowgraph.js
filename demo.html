@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+
+    <script src="lib-node.js"></script>
+
+    <style>
+        node-canvas {
+            height: 80vh;
+        }
+    </style>
+</head>
+
+<body>
+
+    <node-canvas>
+
+        <node-item id="A" to="B" style="left:100px;top:100px;">
+            Register
+        </node-item>
+
+        <node-item id="B" to="C,D" style="left:400px;top:200px;">
+            Dashboard
+        </node-item>
+
+        <node-item id="C" style="left:700px;top:100px;">
+            Jeux
+        </node-item>
+
+        <node-item id="D" style="left:700px;top:350px;">
+            Leave
+        </node-item>
+
+    </node-canvas>
+
+</body>
+
+</html>
