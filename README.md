@@ -1,5 +1,10 @@
 # 🧠 Node Graph
 
+## Demo
+
+![NodeGraph demo](demo.gif)
+
+
 **Node Graph** est une librairie front-end légère basée sur **Web Components** permettant de créer facilement des graphes interactifs et stylisables.
 
 Elle a été pensée pour être :
